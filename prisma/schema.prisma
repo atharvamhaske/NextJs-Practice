@@ -31,3 +31,14 @@ model Post {
   author User @relation(fields: [authorId], references: [id])
   authorId Int
 }
+
+model User2 {
+  id Int @id @default(autoincrement())
+  post Post2[] //this user can make multiple posts 
+}
+
+model Post2 {
+  id Int  @id
+  userId Int //this post belongs to user with this userId
+  user User2 @relation(fields: [userId], references: [id])
+}
