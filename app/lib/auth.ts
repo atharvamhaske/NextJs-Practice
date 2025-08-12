@@ -26,4 +26,33 @@ export function verifyToken(token: string): JWTPayload | null {
 
 export async function getUserFromReq(req: NextRequest) {
     const cookieStore = cookies();
+    const token = (await cookieStore).get("token")?.value;
+    if(!token) return null;
+
+    const payload = verifyToken(token);
+    if(!payload) return null;
+
+    const user = await prisma.user.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, email: true, role: true}
+    });
+    return user;
+}
+
+export async function requireAuth(req: NextRequest) {
+    const user = await getUserFromReq
+    if(!user) {
+        return {
+            ok: false as const,
+            status: 401,
+            error: "Unauthorized" as const
+        }
+        return {
+            ok: true as const, user
+        };
+    }
+};
+
+export function requireRole(userRole: Role, allowed: Role[]) {
+    return allowed.includes(userRole);
 }
