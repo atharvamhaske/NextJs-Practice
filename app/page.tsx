@@ -1,13 +1,21 @@
-import Link from "next/link";
+"use server"
+import { getPosts } from "./lib/data"
+import Link from "next/link"
+export default async function Home() {
 
-export default function Home(){
+  const post = await getPosts();
+
   return (
-    <>
-     <div className="text-xl w-screen h-screen flex items-center justify-center">This is a Todo app <br /> <div className="text-md bg-white text-blue-400 flex items-center justify-center  "> <Link href="/signin">Sign In</Link> <br />
-     <Link href="/signup">Sign Up</Link>
-     </div></div> <br />
-     
-
-    </>
+    <div className="flex flex-col gap-2 justify-center items-center bg-neutral-700 text-gray-50">
+      <h1>Blog</h1>
+       <p className="text-white/40">Click on blog to read it</p>
+       <ul>
+        {post.map((posts) => (
+          <li key={posts.slug}>
+            <Link href={`/blog/${posts.slug}`}>{posts.title}</Link>
+          </li>
+        ))}
+       </ul>
+    </div>
   )
 }
