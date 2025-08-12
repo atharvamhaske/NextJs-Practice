@@ -15,30 +15,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id Int @id @default(autoincrement())
-  username String
-  email String
+  id String @id @default(cuid())
+  email String @unique
   password String
-  post Post[]
+  role Role @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]
 }
 
-model Post {
-  id Int @id @default(autoincrement())
+enum Role {
+  USER
+  ROLE
+}
+
+model Task {
+
+  id String @id @default(cuid())
   title String
-  content String
-  author User @relation(fields: [authorId], references: [id])
-  authorId Int
+  desciprtion String?
+  status TaskStatus @default(PENDING)
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id])
+  version Int 
+  deletedAt DateTime? 
+  createdAt DateTime
+  updatedAt DateTime
+
+  @@index([status])
+  @@index([ownerId])
+  @@index([deletedAt])
+  @@unique([title, ownerId])
+
 }
 
-model User2 {
-  id Int @id @default(autoincrement())
-  post Post2[] //this user can make multiple posts 
+enum TaskStatus {
+  PENDING
+  DONE
 }
 
-model Post2 {
-  id Int  @id
-  userId Int //this post belongs to user with this userId
-  user User2 @relation(fields: [userId], references: [id])
+model IdempotencyKEy {
+  id String @id @default(cuid())
+  key String
+  method String
+  path String
+  userId String
+  repsone Json
+  createdAt DateTime @default(now())
 }
